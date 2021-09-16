@@ -50,20 +50,6 @@ def chromeInit(savePath=os.getcwd(), flag=False):
     log_console("Chrome init complete...")
     return chrome
 
-# 将数组逐行写入txt
-def write_arr(arr, file):
-    f = open(file, 'w')
-    f.write('\n'.join(arr))
-    f.close()
-
-# 逐行读取txt生成返回数组
-def load_arr(file):
-    arr = []
-    f = open(file, 'r')
-    text = f.read()
-    arr = text.split('\n')
-    return arr
-    f.close()
 
 # 获取最新文件（时间排序取最后）
 def sort_file(path):
@@ -99,21 +85,6 @@ def clean_fold(path):
 def js_click(driver, element):
     driver.execute_script("arguments[0].click();", element)
 
-# 循环点击，直到下载完成
-def loop_click(element):
-    element.click()
-    time.sleep(0.1)     # 等待下载完成
-    if len(os.listdir(temp_files)) == 0:
-        log_console('再点一次')
-        loop_click(element)
-
-def loop_js_click(driver, element):
-    driver.execute_script("arguments[0].click();", element)
-    time.sleep(1)       # 等待下载完成
-    if len(os.listdir(temp_files)) == 0:
-        log_console('再点一次')
-        loop_js_click(driver, element)
-
 def IE(name, total):#IndicatorsExport
     return '''https://esi.clarivate.com/IndicatorsExport.action?exportFile&_dc=1368621151464&groupBy=ResearchFronts&start=0&limit={0}&filterBy=ResearchFields&filterValue={1}&show=Top&sort=%5B%7B%22property%22:%22highPapers%22,%22direction%22:%22DESC%22%7D%5D&colFilterVal=&exportType=indicators&colNames=RowSeq,,Research%20Fronts,Top%20Papers,Mean%20Year&fileType=Excel&f=IndicatorsExport.xls'''.format(total, quote(name.upper()))
 def DE(name, limit_top_page):#DocumentsExport
@@ -134,9 +105,7 @@ def Download(chrome, urls, path):
             while (len(os.listdir(temp_files)) == 0
                    or os.listdir(temp_files)[0].split('.')[-1] == 'tmp'
                    or os.listdir(temp_files)[0].split('.')[-1] == 'crdownload'): time.sleep(0.1)
-
             movefile(temp_files + '\\' + sort_file(temp_files), path)
-            time.sleep(0.1)  # 稍微控制时间，防止反爬
             break
         except:
             log_console('文件移动转换错误\n')
@@ -166,28 +135,6 @@ if __name__ == "__main__":
     t = t.split(' ')[0]
     month = month_short[t]
     log_console('当前更新至{}月'.format(month))
-
-    # ========== ========== ========== ==========
-    # 获取 Research Fronts 条目总数 （只是为了日志信息）
-    total_research_fronts = 0
-    # 选择Research Fronts并收集科目元素列表
-    chrome.find_element_by_css_selector(".select2-choice").click()  # 点击弹出下拉菜单
-    elements = chrome.find_elements_by_css_selector(".select2-result-label")  # 下拉菜单中的元素
-    for element in elements:
-        if element.text == "Research Fronts":
-            element.click()  # 选择 Research Fronts
-
-    js_click(chrome, chrome.find_element_by_css_selector(".add-filters"))  # 点击添加过滤器
-    chrome.find_element_by_css_selector(
-        ".popup-wrapper>ul>li:nth-child(2)").click()  # 点击 Research Field
-    subjectLabels = chrome.find_elements_by_css_selector(".checkbox-columns>div>label")  # 随便获取一个学科
-    js_click(chrome, subjectLabels[2]), time.sleep(1), js_click(chrome, subjectLabels[2]) # 添加过滤器后再删除，页面即可显示所有学科总条目数
-    time.sleep(1)  # 这个时间影响不大，一次程序运行一次
-    total_research_fronts = int(chrome.find_element_by_css_selector("#grid>div:nth-child(1)>div>div>div:nth-child(1)>div>span")
-                                      .get_attribute('innerText')
-                                      .split(' ')[1])  # 获取总条目总数
-    log_console('总条目数:{}'.format(total_research_fronts))
-    # ========== ========== ========== ==========
 
     process_research_fronts = 0   #总进度
     for index_field in range(len(Fields)):
@@ -277,8 +224,9 @@ if __name__ == "__main__":
             hour = time.localtime(time.time()).tm_hour
             minute = time.localtime(time.time()).tm_min
             if hour >= 21 and minute >= 55:
+                log_console("关机...")
                 os.system('shutdown -s')
-            log_console('[{}/21]{}进度:{}/{} {:.2f}%  总进度:{}/{} {:.2f}%\n'.format(index_field, Fieldc[index_field], process, total, process/total*100, process_research_fronts, total_research_fronts, process_research_fronts/total_research_fronts*100))
+            log_console('[{}/21]{}进度:{}/{} {:.2f}%\n'.format(index_field, Fieldc[index_field], process, total, process/total*100, process_research_fronts))
         log_console('{}收集完成\n'.format(Fieldc[index_field]))
     log_console('所有科目收集完成。')
 
