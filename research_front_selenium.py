@@ -4,9 +4,7 @@
 # -*- coding:utf-8 -*-
 import os, shutil
 import time
-import requests
-from lxml import etree
-from openpyxl import Workbook
+import datetime
 from urllib.parse import quote
 from openpyxl import load_workbook
 from selenium import webdriver
@@ -102,9 +100,12 @@ def Download(chrome, urls, path):
 
         try:
             # 等待下载完成 确保中间文件(.tmp .crdownload)完全转好
+            time.sleep(0.05)    # 测试出的合适时间
+            # log_console('测试开始')
             while (len(os.listdir(temp_files)) == 0
                    or os.listdir(temp_files)[0].split('.')[-1] == 'tmp'
-                   or os.listdir(temp_files)[0].split('.')[-1] == 'crdownload'): time.sleep(0.1)
+                   or os.listdir(temp_files)[0].split('.')[-1] == 'crdownload'): time.sleep(0.01)
+            # log_console('测试结束')
             movefile(temp_files + '\\' + sort_file(temp_files), path)
             break
         except:
@@ -113,8 +114,8 @@ def Download(chrome, urls, path):
 
 # 打印信息时加上时间
 def log_console(str):
-    print('{} {}'.format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), str))
-
+    # print('{} {}'.format(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), str))    # 含微秒的日期时间
+    print('{} {}'.format(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), str))
 #=========#
 # 主函数  #
 #=========#
@@ -180,7 +181,7 @@ if __name__ == "__main__":
         ws = load_workbook('./{1}.{2}/{0}/{0}TOP{1}.{2}.xlsx'.format(Fieldc[index_field], years, month)).active
         total = ws.max_row - 7
         if process == total:
-            log_console('{}已收集'.format(Fieldc[index_field]))
+            log_console('{}已收集完成'.format(Fieldc[index_field]))
             continue
         row_range = ws[7+process:len(ws['A'])-1]
 
@@ -229,11 +230,3 @@ if __name__ == "__main__":
             log_console('[{}/21]{}进度:{}/{} {:.2f}%\n'.format(index_field, Fieldc[index_field], process, total, process/total*100, process_research_fronts))
         log_console('{}收集完成\n'.format(Fieldc[index_field]))
     log_console('所有科目收集完成。')
-
-
-
-
-
-
-
-
