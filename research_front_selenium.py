@@ -164,10 +164,12 @@ if __name__ == "__main__":
                 if subjectLabel.text == Fields[index_field]:
                     subjectLabel.click()  # 选择学科
                     break
-            time.sleep(1)  # 这个时间影响不大，每个学科只执行一次
+            time.sleep(1)  # 这个时间影响不大，每个学科只执行一次(如果出现list out of index 就把这个时间改长)
+            log_console('总条目：{}'.format(chrome.find_element_by_css_selector("#grid>div:nth-child(1)>div>div>div:nth-child(1)>div>span")
+                                .get_attribute('innerText')))
             subject_total = int(chrome.find_element_by_css_selector("#grid>div:nth-child(1)>div>div>div:nth-child(1)>div>span")
                                 .get_attribute('innerText')
-                                .split(' ')[1])  # 获取该学科条目总数
+                                .split(':')[1])  # 获取该学科条目总数
             # ========== ========== ========== ==========
 
             Download(chrome, IE(Fields[index_field], subject_total), '{1}.{2}/{0}/{0}TOP{1}.{2}.xlsx'.format(Fieldc[index_field], years, month))
