@@ -165,6 +165,8 @@ if __name__ == "__main__":
                     subjectLabel.click()  # 选择学科
                     break
             time.sleep(1)  # 这个时间影响不大，每个学科只执行一次(如果出现list out of index 就把这个时间改长)
+            if chrome.find_element_by_css_selector("#grid>div:nth-child(1)>div>div>div:nth-child(1)>div>span").get_attribute('innerText') == "":
+                time.sleep(1)
             log_console('总条目：{}'.format(chrome.find_element_by_css_selector("#grid>div:nth-child(1)>div>div>div:nth-child(1)>div>span")
                                 .get_attribute('innerText')))
             subject_total = int(chrome.find_element_by_css_selector("#grid>div:nth-child(1)>div>div>div:nth-child(1)>div>span")
@@ -232,3 +234,4 @@ if __name__ == "__main__":
             log_console('[{}/21]{}进度:{}/{} {:.2f}%\n'.format(index_field, Fieldc[index_field], process, total, process/total*100, process_research_fronts))
         log_console('{}收集完成\n'.format(Fieldc[index_field]))
     log_console('所有科目收集完成。')
+'''D:\\cbb work\\ResearchFieldNUISTCrawler_selenium/2021.9/HCP/\\278-LARGE-SCALE FEATURES OF LAST INTERGLACIAL CLIMATE RESULTS FROM EVALUATING THE LIG127K SIMULATIONS FOR THE COUPLED MODEL INTERCOMPARISON PROJECT (CMIP6)-PALEOCLIMATE MODELING INTERCOMPARISONT1.html'''
